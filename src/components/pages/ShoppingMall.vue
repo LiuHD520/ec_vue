@@ -40,12 +40,30 @@
                 <swiper :options="swiperOption">
                     <swiper-slide v-for=" (item ,index) in recommendGoods" :key="index">
                         <div class="recommend-item">
-                                <img :src="item.image" width="80%" />
-                                <div>{{item.goodsName}}</div>
-                                <div>￥{{item.price}} (￥{{item.mallPrice}})</div>  
+                            <img :src="item.image" width="80%" />
+                            <div>{{item.goodsName}}</div>
+                            <div>￥{{item.price | moneyFilter}} (￥{{item.mallPrice | moneyFilter}})</div>  
                         </div>
                     </swiper-slide>
                 </swiper>
+            </div>
+        </div>
+        <!--floor one area-->
+        <floorComponent :floorData="floor1" :floorTitle="floorName.floor1"></floorComponent>
+        <floorComponent :floorData="floor2" :floorTitle="floorName.floor2"></floorComponent>
+        <floorComponent :floorData="floor3" :floorTitle="floorName.floor3"></floorComponent>
+
+        <!--Hot Area-->
+        <div class="hot-area">
+            <div class="hot-title">热卖商品</div>
+            <div class="hot-goods">
+                <van-list>
+                    <van-row gutter="20">
+                        <van-col span="12" v-for="( item, index) in hotGoods" :key="index">
+                             <goods-info :goodsImage="item.image" :goodsName="item.name" :goodsPrice="item.price"></goods-info>
+                        </van-col>
+                    </van-row>
+                </van-list>
             </div>
         </div>
     </div>
@@ -55,6 +73,10 @@
     import axios from 'axios'
     import 'swiper/dist/css/swiper.css'
     import {swiper, swiperSlide} from 'vue-awesome-swiper'
+    import floorComponent from '../component/floorComponent'
+    import goodsInfo from '../component/goodsInfoComponent'
+    import url from '@/serviceAPI.config.js'
+    import {toMoney} from '@/filter/moneyFilter.js'
     export default {
         data () {
             return {
@@ -67,16 +89,21 @@
                 adBanner:'',
                 recommendGoods:[],
                 floor1:[],
-                floor1_0:{},
-                floor1_1:{},
-                floor1_2:{},
-                floor1_3:{}
+                floor2:[],
+                floor3:[],
+                floorName:{},
+                hotGoods:[]
             }
         },
-        components:{swiper,swiperSlide},
+        components:{swiper,swiperSlide,floorComponent,goodsInfo},
+        filters:{
+            moneyFilter(money){
+                return toMoney(money)
+            }  
+        },
         created(){
             axios({
-                url:'https://www.easy-mock.com/mock/5b138bbae2546c72e6c64f70/ecVues/index',
+                url:url.getShopingMallInfo,
                 method:'get'
             })
             .then(response => {
@@ -86,6 +113,11 @@
                     this.bannerPicArray = response.data.data.slides;
                     this.adBanner = response.data.data.advertesPicture.PICTURE_ADDRESS;
                     this.recommendGoods = response.data.data.recommend;
+                    this.floor1 = response.data.data.floor1; //楼层1数据
+                    this.floor2 = response.data.data.floor2; 
+                    this.floor3 = response.data.data.floor3; 
+                    this.floorName = response.data.data.floorName;
+                    this.hotGoods = response.data.data.hotGoods;
                 }
             })
             .catch((error) => {     
@@ -156,5 +188,12 @@
         font-size: 12px;
         text-align: center;
     }
- 
+
+    .hot-area{
+        text-align: center;
+        font-size:14px;
+        height: 1.8rem;
+        line-height:1.8rem;
+    }
+   
 </style>
