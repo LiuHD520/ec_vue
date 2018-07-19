@@ -3,7 +3,7 @@ const mysql = require('mysql')
 
 let router = new Router();
 var db = mysql.createPool({ host: '116.196.82.28', user: 'root', password: 'root', database: 'koa2' });
-const q = function (sql, values) {
+const sqlQ = function (sql, values) {
     return new Promise((resolve, reject) => {
         db.getConnection((err, conn) => {
             if (err) return reject(err)
@@ -22,9 +22,9 @@ router.get('/',async(ctx)=>{
 
 router.post('/register',async(ctx)=>{
     var postVal = ctx.request.body;
-    let userInfo = await q('select * from user where userName=?', [postVal.username]);
+    let userInfo = await sqlQ('select * from user where userName=?', [postVal.username]);
     if (userInfo.length == 0) {
-        let userInto = await q('INSERT INTO user (userName, password, createAt) VALUE (?,?,?)', [postVal.username, postVal.password, postVal.createAt]);
+        let userInto = await sqlQ('INSERT INTO user (userName, password, createAt) VALUE (?,?,?)', [postVal.username, postVal.password, postVal.createAt]);
         console.log(userInto)
         ctx.body={
             code:200,
