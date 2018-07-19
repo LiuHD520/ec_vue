@@ -7,6 +7,12 @@ const bodyparser = require('koa-bodyparser')
 const cors = require('koa2-cors')
 
 
+/****
+ * request=请求
+ * response=响应、回应
+ * 
+ * *****/ 
+
 app.use(bodyparser())
 app.use(cors())
 
