@@ -18,11 +18,13 @@ app.use(cors())
 
 let user = require('./appAPI/user.js')
 let home = require('./appAPI/home.js')
+let goods = require('./appAPI/goods.js')
 
 
 // 装载所有子路由
 let router = new Router()
 router.use('/user', user.routes())
+router.use('/goods', goods.routes())
 router.use('/home', home.routes())
 
 // egg.js大型项目路由项目配置

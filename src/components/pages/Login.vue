@@ -1,7 +1,7 @@
 <template>
     <div>
        <van-nav-bar
-        title="用户注册"
+        title="用户登录"
         left-text="返回"
         left-arrow
         @click-left="goBack"
@@ -29,10 +29,10 @@
         <div class="register-button">
             <van-button 
             type="primary" 
-            @click="registerAction" 
+            @click="loginAction" 
             size="large" 
             :loading="openLoading"
-            >马上注册</van-button>
+            >登录</van-button>
         </div>
        </div>
  
@@ -54,58 +54,74 @@
                 passwordErrorMsg: '', // 当密码出错时提醒信息
             }
         },
+        created(){
+            if(localStorage.userInfo) {
+                Toast.success('您已经登录')
+                this.$router.push('/')
+            }
+        },
         methods: {
             goBack() {
                 this.$router.go(-1)   
             },
-            registerAction(){
+            loginAction(){
                 // if (this.checkForm()){
                 //     this.axiosRegisterUser()
                 // }
-                this.checkForm() && this.axiosRegisterUser()
+                this.checkForm() && this.axiosloginUser()
             },
-            axiosRegisterUser(){
+            axiosloginUser(){
                 this.openLoading = true
                 let myDate = new Date()
                 let timestamp=myDate.toLocaleString()
-                this.createTime = timestamp
-                // this.createTime = timestamp.substring(0,timestamp.length-3) //去掉后三位
+                this.loginTime = timestamp
+                // this.loginTime = timestamp.substring(0,timestamp.length-3) //去掉后三位
                  axios({
-                    url: url.registerUser,
+                    url: url.login,
                     method: 'post',
                     data:{
                         username:this.username,
                         password:this.password,
-                        createAt:this.createTime
+                        loginAt:this.loginTime
                     }
                 })
                 .then(response => {
                     console.log(response)
                     if (response.data.code == 200) {
-                        Toast.success(response.data.msg)
-                        this.$router.push('/')
+                        new Promise((resolve, reject)=>{
+                            localStorage.userInfo = {userName:this.username}
+                                setTimeout(()=>{resolve()},500)
+                            }).then(()=>{
+                                Toast.success(response.data.msg)
+                                this.$router.push('/')
+                            }).catch(err=>{
+                                Toast.fail('登录状态保存失败')
+                                console.log(err)
+                            })
                     } else if (response.data.code == 201) {
                         Toast.fail(response.data.msg)
+                        this.openLoading = false
+                    } else {
+                        Toast.fail('登录失败')
                         this.openLoading = false
                     }
                 })
                 .catch((error) => {
-                    console.log(error)
-                    Toast.fail('注册失败')
+                    Toast.fail('登录失败')
                     this.openLoading = false
                 })
             },
             /*****表单验证方法*****/
             checkForm(){
                 let isOk = true
-                if(this.username.length<5){
-                    this.usernameErrorMsg = "用户名不能少于5位"
+                if(!this.username.length){
+                    this.usernameErrorMsg = "用户名不能为空"
                     isOk = false
                 } else {
                     this.usernameErrorMsg = ""
                 }
-                if(this.password.length<6){
-                    this.passwordErrorMsg = '密码不能少于6位'
+                if(!this.password.length){
+                    this.passwordErrorMsg = '密码不能为空'
                     isOk = false
                 } else {
                     this.passwordErrorMsg = ''
