@@ -1,5 +1,6 @@
 <template>
     <div>
+
         <div class="navbar-div">
             <van-nav-bar title="类别列表"></van-nav-bar>
         </div>
@@ -18,9 +19,18 @@
               <van-col span="18">
                   <div class="tabCategorySub">
                       <van-tabs v-model="active">
-                          <van-tab v-for="(item,index) in categorySub" :key="index" :title="item.MALL_SUB_NAME">
+                          <van-tab v-for="(item,index) in categorySub" :key="index" :title="item.MALL_SUB_NAME">     
                           </van-tab>
                       </van-tabs>
+                  </div>
+                  <div id="list-div">
+                    <van-pull-refresh v-model="isRefresh" @refresh="onFefresh">
+                       <van-list v-model="loading" :finished="finished" @load="onLoad">
+                            <div class="list-item" v-for="item in list" :key="item">
+                                {{item}}
+                            </div>
+                        </van-list>
+                    </van-pull-refresh>
                   </div>
               </van-col>
           </van-row>  
@@ -39,10 +49,19 @@
                 categoryIndex:0,
                 categorySub:[],  //小类类别
                 active:0,    //激活标签的值
+                loading: false, 
+                finished: false, //上拉加载
+                list: [],//商品数据
+                isRefresh: false, //下拉刷新
             }
         },
         created(){
             this.getCategory();
+        },
+        mounted(){
+            let winHeight = document.documentElement.clientHeight
+            document.getElementById('leftNav').style.height=winHeight-46 +'px'
+            document.getElementById('list-div').style.height=winHeight-90 +'px'
         },
         methods: {
             getCategory() {
@@ -85,7 +104,28 @@
                 .catch(error=>{
                     console.log(error)
                 })
-            }  
+            },
+            // 上拉加载
+            onLoad(){
+                setTimeout(()=>{
+                    for (let i=0; i<10; i++){
+                        this.list.push(this.list.length+1)
+                    }
+                    this.loading=false
+                    if(this.list.length>=40){
+                        this.finished = true
+                    }
+                }, 500)
+            },
+            // 下拉刷新
+            onFefresh(){
+                setTimeout(()=>{
+                    this.isRefresh = false
+                    this.finished = false
+                    this.list = []
+                    this.onLoad()
+                }, 500)
+            } 
         },
 
     }
@@ -104,5 +144,14 @@
     }
     .categoryActice{
         background-color: #fff;
+    }
+    .list-item {
+        text-align: center;
+        line-height: 80px;
+        border: 1px solid #f0f0f0;
+        background-color: #fff;   
+    }
+    #list-div {
+        overflow: scroll;
     }
 </style>

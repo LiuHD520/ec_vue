@@ -3,8 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import { Tab, Tabs, Button, Row, Col, Swipe, SwipeItem, Lazyload, List, Field, NavBar } from 'vant'
-Vue.use(Tab)
+import { PullRefresh,Tab, Tabs, Button, Row, Col, Swipe, SwipeItem, Lazyload, List, Field, NavBar } from 'vant'
+Vue.use(PullRefresh)
+  .use(Tab)
   .use(Tabs)
   .use(Button)
   .use(Row)
