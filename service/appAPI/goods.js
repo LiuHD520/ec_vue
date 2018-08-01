@@ -60,16 +60,19 @@ router.post('/getCategorySubList',async(ctx)=>{
 })
 
 /**根据类别获取商品列表 */
-router.get('/getGoodsListByCategorySubID',async(ctx)=>{
-    try{
-        let categorySubId = ctx.request.body.categorySubId
-        // let categorySubId='2c9f6c946016ea9b016016f79c8e0000'
-        let result = await sqlQ('select * from goods where SUB_ID=?', [categorySubId]);
+router.post('/getGoodsListByCategorySubID',async(ctx)=>{
+    try {
+        let categorySubId = ctx.request.body.categorySubId //子类ID
+        let page = ctx.request.body.page // 当前页数
+        let num = ctx.request.body.num || 10 //每页显示数量
+        let start = (page-1)*num
+        let end = num
+        // console.log(categorySubId, page, num)
+        let result = await sqlQ(`select * from goods where SUB_ID=? limit ?,?`, [categorySubId,start,end]);
         ctx.body={code:200,message:result}
-    }catch(error){
+    } catch(error) {
         ctx.body={code:500,message:error}
-    }
-    
+    }  
 })
 
 module.exports = router;
