@@ -26,11 +26,11 @@
                   <div id="list-div">
                     <van-pull-refresh v-model="isRefresh" @refresh="onFefresh">
                        <van-list v-model="loading" :finished="finished" @load="onLoad">
-                            <div class="list-item" v-for="(item,index) in goodlist" :key="index">
+                            <div class="list-item" @click="goGoodsInfo(item.ID)" v-for="(item,index) in goodlist" :key="index">
                                 <div class="list-item-img"><img :src="item.IMAGE1" :onerror="errorImg" width="100%"/></div>
                                 <div class="list-item-text">
                                     <div>{{item.NAME}}</div>
-                                    <div class="">￥{{item.ORI_PRICE}}</div>
+                                    <div class="">￥{{ parseFloat(item.ORI_PRICE) | moneyFilter }}</div>
                                 </div>
                             </div>
                         </van-list>
@@ -46,6 +46,7 @@
 <script>
     import axios from 'axios'
     import url from '@/serviceAPI.config.js'
+    import {toMoney} from '@/filter/moneyFilter.js'
     export default {
         data() {
             return {
@@ -63,13 +64,18 @@
                 errorImg: 'this.src="' + require('@/assets/images/location.png')+ '"',
             }
         },
+        filters:{
+            moneyFilter(money){
+                return toMoney(money)
+            }  
+        },
         created(){
             this.getCategory();
         },
         mounted(){
             let winHeight = document.documentElement.clientHeight
-            document.getElementById('leftNav').style.height=winHeight-46 +'px'
-            document.getElementById('list-div').style.height=winHeight-90 +'px'
+            document.getElementById('leftNav').style.height=winHeight-46-50 +'px'
+            document.getElementById('list-div').style.height=winHeight-90-50 +'px'
         },
         methods: {
             getCategory() {
@@ -165,6 +171,9 @@
                 this.finished=false
                 this.page=1
                 this.onLoad()
+            },
+            goGoodsInfo(id){
+                this.$router.push({name:'Goods',params: {goodsId: id}})
             }
         },
 
